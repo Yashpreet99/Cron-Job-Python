@@ -27,13 +27,15 @@ jobs:
           python-version: "3.11"
           cache: "pip"       # Pip cache for faster installs
 
+      # - name: Install dependencies
+      #   run: |
+      #     if [ -f Requirements.txt ]; then
+      #       pip install -r Requirements.txt
+      #     else
+      #       pip install requests
+      #     fi
       - name: Install dependencies
-        run: |
-          if [ -f Requirements.txt ]; then
-            pip install -r Requirements.txt
-          else
-            pip install requests
-          fi
+        run: pip install requests
 
       - name: Ensure Logs folder exists
         run: mkdir -p Logs
