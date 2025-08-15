@@ -1,0 +1,50 @@
+name: Signature Logger
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"   # Every 20 minutes (UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: write            # Allow pushing log updates back to the repo
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false  # Don't cancel if a new run starts (safe since job is short)
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5       # Prevent a stuck run from overlapping the next one
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"       # Pip cache for faster installs
+
+      - name: Install dependencies
+        run: |
+          if [ -f Requirements.txt ]; then
+            pip install -r Requirements.txt
+          else
+            pip install requests
+          fi
+
+      - name: Ensure Logs folder exists
+        run: mkdir -p Logs
+
+      - name: Run script
+        run: python APIRequestV3.py
+
+      - name: Commit and push logs (if changed)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Logs/Logs.txt
+          git commit -m "Update logs [skip ci]" || echo "No changes to commit"
+          git push
