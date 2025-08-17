@@ -1,58 +1,58 @@
-name: Signature Logger
+# name: Signature Logger
 
-on:
-  push:
-      branches:
-        - main
-      paths-ignore:
-        - 'Logs/**'
-  schedule:
-    #- cron: "*/20 * * * *"   # Every 20 minutes (UTC)
-    - cron: "0,20,40 * * * *"  # At minute 0, 20, and 40 of each hour
-  workflow_dispatch:
+# on:
+#   push:
+#       branches:
+#         - main
+#       paths-ignore:
+#         - 'Logs/**'
+#   schedule:
+#     #- cron: "*/20 * * * *"   # Every 20 minutes (UTC)
+#     - cron: "0,20,40 * * * *"  # At minute 0, 20, and 40 of each hour
+#   workflow_dispatch:
 
-permissions:
-  contents: write            # Allow pushing log updates back to the repo
+# permissions:
+#   contents: write            # Allow pushing log updates back to the repo
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false  # Don't cancel if a new run starts (safe since job is short)
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   cancel-in-progress: false  # Don't cancel if a new run starts (safe since job is short)
 
-jobs:
-  run-script:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5       # Prevent a stuck run from overlapping the next one
+# jobs:
+#   run-script:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 5       # Prevent a stuck run from overlapping the next one
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: "pip"       # Pip cache for faster installs
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.11"
+#           cache: "pip"       # Pip cache for faster installs
 
-      # - name: Install dependencies
-      #   run: |
-      #     if [ -f Requirements.txt ]; then
-      #       pip install -r Requirements.txt
-      #     else
-      #       pip install requests
-      #     fi
-      - name: Install dependencies
-        run: pip install requests
+#       # - name: Install dependencies
+#       #   run: |
+#       #     if [ -f Requirements.txt ]; then
+#       #       pip install -r Requirements.txt
+#       #     else
+#       #       pip install requests
+#       #     fi
+#       - name: Install dependencies
+#         run: pip install requests
 
-      - name: Ensure Logs folder exists
-        run: mkdir -p Logs
+#       - name: Ensure Logs folder exists
+#         run: mkdir -p Logs
 
-      - name: Run script
-        run: python APIRequestV3.py
+#       - name: Run script
+#         run: python APIRequestV3.py
 
-      - name: Commit and push logs (if changed)
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Logs/Logs.txt
-          git commit -m "Update logs" || echo "No changes to commit"
-          git push
+#       - name: Commit and push logs (if changed)
+#         run: |
+#           git config user.name "github-actions[bot]"
+#           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+#           git add Logs/Logs.txt
+#           git commit -m "Update logs" || echo "No changes to commit"
+#           git push
